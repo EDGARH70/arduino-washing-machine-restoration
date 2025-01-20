@@ -4,19 +4,25 @@
 
 // Definir pines para las entradas
 const int pinA = 22;
+const int pinB = 24;#include <Arduino.h>
+#ifndef TEMP_MODULE_H
+#define TEMP_MODULE_H
+
+// Definir pines para las entradas
+const int pinA = 22;
 const int pinB = 24;
 const int pinC = 26;
 const int pinD = 28;
 const int pinE = 30;
 
 // Definir pines para las salidas
-const int pinY0 ;
-const int pinY1 ;
-const int pinY2 ;
-const int pinY3 ;
-const int pinY4 ;
-const int pinY5 ;
-const int pinY6 ;
+const int pinY0 = 2;
+const int pinY1 = 3;
+const int pinY2 = 4;
+const int pinY3 = 5;
+const int pinY4 = 6;
+const int pinY5 = 7;
+const int pinY6 = 8;
 
 // Funciones
 
@@ -39,7 +45,7 @@ void setuptempGPIO() {
   pinMode(pinY6, OUTPUT);
 
   // Iniciar comunicación serie para depuración
-
+  Serial.begin(9600);
 }
 
 // Función para leer las entradas y manejar las salidas
@@ -87,16 +93,31 @@ void looptempGPIO() {
   }
 
   // Escribir las salidas en los pines digitales
-  digitalWrite(pinY0, (outputs == 0x40) ? HIGH : LOW);  // Y0
-  digitalWrite(pinY1, (outputs == 0x20) ? HIGH : LOW);  // Y1
-  digitalWrite(pinY2, (outputs == 0x10) ? HIGH : LOW);  // Y2
-  digitalWrite(pinY3, (outputs == 0x08) ? HIGH : LOW);  // Y3
-  digitalWrite(pinY4, (outputs == 0x04) ? HIGH : LOW);  // Y4
-  digitalWrite(pinY5, (outputs == 0x02) ? HIGH : LOW);  // Y5
-  digitalWrite(pinY6, (outputs == 0x01) ? HIGH : LOW);  // Y6
+  digitalWrite(pinY0, (outputs & 0x40) ? HIGH : LOW);  // Y0
+  digitalWrite(pinY1, (outputs & 0x20) ? HIGH : LOW);  // Y1
+  digitalWrite(pinY2, (outputs & 0x10) ? HIGH : LOW);  // Y2
+  digitalWrite(pinY3, (outputs & 0x08) ? HIGH : LOW);  // Y3
+  digitalWrite(pinY4, (outputs & 0x04) ? HIGH : LOW);  // Y4
+  digitalWrite(pinY5, (outputs & 0x02) ? HIGH : LOW);  // Y5
+  digitalWrite(pinY6, (outputs & 0x01) ? HIGH : LOW);  // Y6
 
   // Pausa para evitar lecturas rápidas
   delay(500);
 }
 
-#endif
+// Función para obtener las salidas actuales
+int getTempOutputs() {
+    // Leer las salidas digitales
+    int outputs = 0;
+    outputs |= (digitalRead(pinY0) == HIGH) ? 0x40 : 0;
+    outputs |= (digitalRead(pinY1) == HIGH) ? 0x20 : 0;
+    outputs |= (digitalRead(pinY2) == HIGH) ? 0x10 : 0;
+    outputs |= (digitalRead(pinY3) == HIGH) ? 0x08 : 0;
+    outputs |= (digitalRead(pinY4) == HIGH) ? 0x04 : 0;
+    outputs |= (digitalRead(pinY5) == HIGH) ? 0x02 : 0;
+    outputs |= (digitalRead(pinY6) == HIGH) ? 0x01 : 0;
+
+    return outputs;
+}
+
+#endif // TEMP_MODULE_H
